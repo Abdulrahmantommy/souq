@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>598</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -629,7 +629,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
      </rect>
     </property>
     <property name="text">
-     <string>Run Server</string>
+     <string>Checker</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -941,9 +941,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>160</y>
+      <y>120</y>
       <width>221</width>
-      <height>18</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -959,17 +959,52 @@ p, li { white-space: pre-wrap; }
      <string>On Fire :</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLineEdit" name="lineEdit_file_csv">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>150</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::Normal</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="dragEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_browser">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
-      <width>131</width>
-      <height>18</height>
+      <y>150</y>
+      <width>61</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Round  :</string>
+     <string>GET</string>
     </property>
    </widget>
    <zorder>label_note_2</zorder>
@@ -988,7 +1023,8 @@ p, li { white-space: pre-wrap; }
    <zorder>lineEdit_path</zorder>
    <zorder>label_note</zorder>
    <zorder>label_2</zorder>
-   <zorder>label_5</zorder>
+   <zorder>lineEdit_file_csv</zorder>
+   <zorder>pushButton_browser</zorder>
   </widget>
  </widget>
  <resources/>

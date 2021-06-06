@@ -8,7 +8,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QStatusBar
 from selenium import webdriver
-from selenium.webdriver.common.proxy import Proxy, ProxyType
+import pandas as pd
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -29,6 +29,8 @@ from scrapy.selector import Selector
 from threading import Thread
 import requests as r
 from bs4 import BeautifulSoup
+from requests.exceptions import ConnectionError as CA
+scriptDir = os.path.dirname(os.path.realpath(__file__))
 html_form = f"""
                            <!DOCTYPE html>
                        <html lang="en">

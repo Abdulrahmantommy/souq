@@ -25,72 +25,81 @@ class rel(QThread):
         self.password = pwd
         self.path = pathh
     def run(self):
-        proxy = Proxy({
-            'proxyType': ProxyType.MANUAL,
-            'httpProxy': '129.146.180.91:3128',
-            'ftpProxy': '129.146.180.91:3128',
-            'sslProxy': '129.146.180.91:3128',
-            'noProxy': '129.146.180.91:3128'  # set this value as desired
-        })
-
+        global server
+        app = Flask(__name__)
         options = Options()
         options.add_argument('--headless')
-
-        driver = webdriver.Firefox(executable_path=self.path, timeout=15, proxy=proxy)
+        self.nump.emit(f'Try Login')
+        driver = webdriver.Firefox(executable_path=fr"{self.path}", timeout=15)
+        self.nump.emit('Open FireFox')
         elements = process_data['signin']['elements']
         reprice_url = process_data['reprice_1']['url']
         driver.get(process_data['signin']['url'])
-        self.nump.emit('Open FireFox')
         self.nump.emit('Open Souq')
         try:
             driver.find_element_by_xpath(elements['signinButton']).click()
+            self.nump.emit('Click SignIN')
         except:
-            time.sleep(2)
-            driver.find_element_by_xpath(elements['signinButton']).click()
+                self.nump.emit(f'Try Again !')
+                self.patdd.emit(' ')
+                driver.close()
         try:
             driver.find_element_by_xpath(elements['emailField']).send_keys(f'{self.email}' + Keys.ENTER)
             self.nump.emit('Set Email')
         except:
-            self.nump.emit('Set Email 2')
-            time.sleep(2)
-            driver.find_element_by_xpath(elements['emailField']).send_keys(f'{self.email}' + Keys.ENTER)
-        for i in range(50):
+                self.nump.emit(f'Try Again !')
+                self.patdd.emit(' ')
+                driver.close()
+
+        for i in range(10):
             self.nump.emit('.')
+            time.sleep(0.5)
             self.nump.emit('..')
+            time.sleep(0.5)
             self.nump.emit('...')
+            time.sleep(0.5)
         try:
             time.sleep(3)
             driver.find_element_by_xpath(elements['continueButton']).click()
+            self.nump.emit('Continue')
+
         except:
-            time.sleep(3)
-            driver.find_element_by_xpath(elements['continueButton']).click()
+            self.nump.emit(f'Try Again !')
+            self.patdd.emit(' ')
+            driver.close()
+
+
         try:
             driver.find_element_by_xpath(elements['passwordField']).send_keys(f'{self.password}' + Keys.ENTER)
+            self.nump.emit('Set Password')
+            driver.get(reprice_url)
         except:
-            time.sleep(3)
-            driver.find_element_by_xpath(elements['passwordField']).send_keys(f'{self.password}' + Keys.ENTER)
-        self.nump.emit('Set Password')
-        driver.get(reprice_url)
-        inn = 40
+                self.nump.emit(f'Try Again !')
+                self.patdd.emit(' ')
+                driver.close()
+
+        inn = 10
         onn = 1
         while onn < inn:
             self.nump.emit(f" For Approve : ({onn})")
             time.sleep(1)
             onn += 1
+        driver.get(reprice_url)
+        time.sleep(5)
+        server = ServerThread(app)
+        server.start()
         try:
-            time.sleep(4)
-            self.patdd.emit(' ☺ ')
-            driver.get(reprice_url)
-            time.sleep(5)
             e = driver.find_element_by_xpath(eann)
             e.send_keys(Keys.ENTER)
             self.nump.emit(f'Welcome')
+            self.patdd.emit(' ☺ ')
         except:
+            server.shutdown()
             self.nump.emit(f'Need  Approved !!')
-        global server
-        app = Flask(__name__)
-        server = ServerThread(app)
-        server.start()
+            self.patdd.emit(' ')
+            driver.close()
+
+
         @app.route('/', methods=['GET', 'POST'])
         def index():
             if request.method == 'GET':
@@ -134,11 +143,12 @@ class checker(QThread):
     s = r.Session()
     EAN = pyqtSignal(str)
     on_fire = pyqtSignal(str)
-    def __init__(self):
+    def __init__(self, csv):
         QThread.__init__(self)
+        self.csv = csv
     def run(self):
         while True:
-            with open('set.csv', newline='') as f:
+            with open(fr'{self.csv}', newline='') as f:
                 Ean = csv.DictReader(f)
                 for ena in Ean:
                     try:
@@ -163,13 +173,15 @@ class checker(QThread):
                             m1 = m[:len(gpg)]
                             price = float(m1)
                             if price < float(ena['limit']):
-                                print('ohh noooo')
                                 print(seller, ':', price, f' - {ena}\n', '__________')
                             elif price >= float(ena['limit']):
                                 self.EAN.emit(f'{ena["ean"]}, {price}')
                                 os.environ['NO_PROXY'] = '127.0.0.1'
-                                r.get(f'http://127.0.0.1:5000/?EAN={ena["ean"]}&title={price - 0.02}')
-                                print(seller, ':', price, f' - {ena}\n', '__________')
+                                try:
+                                    r.get(f'http://127.0.0.1:5000/?EAN={ena["ean"]}&title={price - 0.02}')
+                                    print(seller, ':', price, f' - {ena}\n', '__________')
+                                except:
+                                    continue
                     except:
                         continue
 def remove(ean):
@@ -209,9 +221,9 @@ class UPThread(threading.Thread):
                 s = all_seller[i].text
                 price, seller = nn[0].strip(), s.strip()
                 if ',' in price:
-                    price = price.split(',')
-                    pha = float(price[0] + price[1])
-                    price = float(round(pha, 2))
+                    price = price.replace(',', '.')
+                    #pha = float(price[0] + price[1])
+                    #price = float(round(pha, 2))
                 sahra = souq[i].text
                 IS_SOUQ = sahra.strip()
                 if IS_SOUQ == '':
